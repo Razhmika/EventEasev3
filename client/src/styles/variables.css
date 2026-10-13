@@ -1,0 +1,61 @@
+:root {
+  /* Brand Lavender Palette */
+  --color-primary: #C9B3F5;           /* Primary Lavender */
+  --color-primary-soft: #E9DDFB;      /* Soft Lavender */
+  --color-primary-light: #F8F5FF;     /* Very Light Lavender Tint */
+  --color-primary-dark: #6240A0;      /* Deep Purple Accent */
+  --color-primary-darker: #4B2E80;
+  
+  /* Text Shades */
+  --color-text-title: #35204F;        /* Dark Purple Heading Text */
+  --color-text-body: #4A4458;         /* Neutral Charcoal Body */
+  --color-text-muted: #7E768F;        /* Subdued Caption Text */
+  --color-text-light: #FFFFFF;
+
+  /* Surfaces & Backgrounds */
+  --color-bg-page: #FAF8FF;           /* Pristine Lavender Canvas */
+  --color-surface-card: #FFFFFF;      /* Crisp Pure White Surface */
+  --color-surface-soft: #F4EFFF;
+  --color-surface-overlay: rgba(255, 255, 255, 0.90); /* Frosted Glass */
+  --color-border: #E8E2F2;            /* Subtle Lavender-Gray Border */
+  --color-border-hover: #D1C2EC;
+
+  /* Subtle Premium Gradients */
+  --grad-hero: linear-gradient(135deg, #FFFFFF 0%, #F5EFFF 50%, #E9DDFB 100%);
+  --grad-button-primary: linear-gradient(135deg, #7C52C6 0%, #6240A0 100%);
+  --grad-button-hover: linear-gradient(135deg, #6C42B6 0%, #523090 100%);
+  --grad-card-highlight: linear-gradient(180deg, #FFFFFF 0%, #FAF6FF 100%);
+  --grad-badge-match: linear-gradient(135deg, #F0E6FF 0%, #E2D0FA 100%);
+  --grad-lavender-glow: radial-gradient(circle, rgba(201, 179, 245, 0.25) 0%, rgba(250, 248, 255, 0) 70%);
+
+  /* Semantic Feedback Indicators */
+  --color-success: #288059;
+  --color-success-bg: #E8F8F0;
+  --color-warning: #B26A00;
+  --color-warning-bg: #FFF5E5;
+  --color-danger: #C02D38;
+  --color-danger-bg: #FEECEE;
+  --color-info: #3566B8;
+  --color-info-bg: #EEF4FF;
+
+  /* Typography */
+  --font-family-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-family-serif: 'Playfair Display', Georgia, serif;
+
+  /* Border Radii */
+  --radius-xs: 6px;
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-pill: 9999px;
+
+  /* Controlled Shadows */
+  --shadow-subtle: 0 2px 8px rgba(78, 55, 115, 0.04);
+  --shadow-card: 0 8px 24px rgba(84, 53, 128, 0.07);
+  --shadow-hover: 0 14px 34px rgba(70, 40, 115, 0.12);
+  --shadow-modal: 0 24px 60px rgba(53, 32, 79, 0.18);
+
+  /* Transitions */
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.25s ease;
+}

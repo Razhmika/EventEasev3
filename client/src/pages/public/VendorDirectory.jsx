@@ -48,11 +48,12 @@ export const VendorDirectory = () => {
   const eventTypesList = [
     'Wedding',
     'Birthday',
-    'Corporate',
+    'Engagement',
     'Reception',
     'Anniversary',
-    'Gala',
-    'Cocktail Party'
+    'Corporate',
+    'Housewarming',
+    'Cultural Fest'
   ];
 
   // Load Categories on mount
@@ -195,7 +196,7 @@ export const VendorDirectory = () => {
           <MapPin size={16} style={{ position: 'absolute', left: '12px', top: '12px', color: 'var(--color-text-muted)' }} />
           <input
             type="text"
-            placeholder="e.g. Mumbai, Bangalore..."
+            placeholder="e.g. Coimbatore, Tiruppur, Erode..."
             value={city}
             onChange={(e) => setCity(e.target.value)}
             style={{ paddingLeft: '36px', fontSize: '0.9rem' }}
@@ -310,7 +311,7 @@ export const VendorDirectory = () => {
             <Search size={18} style={{ position: 'absolute', left: '14px', top: '13px', color: 'var(--color-primary-dark)' }} />
             <input
               type="text"
-              placeholder="Search vendors, services, or occasions (e.g. Photography, Catering)..."
+              placeholder="Search wedding, catering, photography, marriage hall, decor..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               style={{ paddingLeft: '40px', fontSize: '0.95rem' }}
@@ -337,7 +338,7 @@ export const VendorDirectory = () => {
         {/* Sorting and Results Counter */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '16px', paddingTop: '14px', borderTop: '1px solid var(--color-border)', flexWrap: 'wrap', gap: '12px' }}>
           <div style={{ fontSize: '0.9rem', color: 'var(--color-text-muted)', fontWeight: 600 }}>
-            Showing <strong style={{ color: 'var(--color-text-title)' }}>{vendors.length}</strong> verified artisans
+            Showing <strong style={{ color: 'var(--color-text-title)' }}>{vendors.length}</strong> verified vendors
             {category && <span> in <em style={{ color: 'var(--color-primary-dark)' }}>{category}</em></span>}
             {eventType && <span> for <em style={{ color: 'var(--color-primary-dark)' }}>{eventType}</em></span>}
           </div>
@@ -545,7 +546,7 @@ export const VendorDirectory = () => {
         <div className="container">
           <h1 style={{ fontSize: '2.5rem', marginBottom: '8px' }}>Vendor Marketplace</h1>
           <p style={{ color: 'var(--color-text-body)', fontSize: '1.05rem', maxWidth: '640px' }}>
-            Discover vetted culinary masters, photographers, scenic venues, and florists across India with instant pricing in INR (₹).
+            Discover trusted caterers, photographers, marriage halls, and decorators across Coimbatore and Tamil Nadu with transparent pricing in INR (₹).
           </p>
         </div>
       </section>

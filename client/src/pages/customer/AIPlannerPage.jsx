@@ -3,12 +3,12 @@ import { Sparkles, Calendar, DollarSign, CheckSquare, Lightbulb, Palette, ArrowR
 import api from '../../services/api';
 
 export const AIPlannerPage = () => {
-  const [eventType, setEventType] = useState('Luxury Wedding & Reception');
-  const [guestCount, setGuestCount] = useState('120');
-  const [totalBudget, setTotalBudget] = useState('25000');
-  const [location, setLocation] = useState('San Francisco, CA');
-  const [themeStyle, setThemeStyle] = useState('Lavender Glow & Candlelit Elegance');
-  const [notes, setNotes] = useState('Artisanal farm-to-table banquet with live jazz accompaniment.');
+  const [eventType, setEventType] = useState('Wedding Reception');
+  const [guestCount, setGuestCount] = useState('200');
+  const [totalBudget, setTotalBudget] = useState('250000');
+  const [location, setLocation] = useState('Coimbatore, Tamil Nadu');
+  const [themeStyle, setThemeStyle] = useState('Traditional Tamil Wedding & Floral Decor');
+  const [notes, setNotes] = useState('Traditional vegetarian feast, stage flower decoration, and candid photography.');
 
   const [loading, setLoading] = useState(false);
   const [plan, setPlan] = useState(null);
@@ -89,7 +89,7 @@ export const AIPlannerPage = () => {
 
           <div>
             <label style={{ fontSize: '0.8rem', fontWeight: 600, display: 'block', marginBottom: '4px' }}>
-              Total Budget ($)
+              Total Budget (₹)
             </label>
             <input
               type="number"
@@ -241,7 +241,7 @@ export const AIPlannerPage = () => {
                     {b.percentage}%
                   </span>
                   <span style={{ fontWeight: 800, color: 'var(--color-text-title)', fontSize: '0.95rem' }}>
-                    ${parseFloat(b.amount).toLocaleString()}
+                    ₹{parseFloat(b.amount).toLocaleString('en-IN')}
                   </span>
                   <span style={{ fontSize: '0.825rem', color: 'var(--color-text-muted)' }}>
                     {b.description}

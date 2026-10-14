@@ -154,7 +154,7 @@ export const ServiceCatalog = () => {
               <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: '14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
                   <span style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--color-text-title)' }}>
-                    ${parseFloat(s.price).toLocaleString()}
+                    ₹{parseFloat(s.price).toLocaleString('en-IN')}
                   </span>
                   <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', display: 'block' }}>
                     per {s.pricing_unit}
@@ -209,7 +209,7 @@ export const ServiceCatalog = () => {
                 <input
                   type="text"
                   required
-                  placeholder="e.g. 5-Course Seasonal Banquet"
+                  placeholder="e.g. Wedding Stage Decoration"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                 />
@@ -218,13 +218,13 @@ export const ServiceCatalog = () => {
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                 <div>
                   <label style={{ fontSize: '0.8rem', fontWeight: 600, display: 'block', marginBottom: '4px' }}>
-                    Price ($) *
+                    Price (₹) *
                   </label>
                   <input
                     type="number"
                     required
                     min={0}
-                    placeholder="3500"
+                    placeholder="15000"
                     value={price}
                     onChange={(e) => setPrice(e.target.value)}
                   />
@@ -235,6 +235,7 @@ export const ServiceCatalog = () => {
                   </label>
                   <select value={pricingUnit} onChange={(e) => setPricingUnit(e.target.value)}>
                     <option value="event">per Event</option>
+                    <option value="plate">per Plate</option>
                     <option value="guest">per Guest</option>
                     <option value="hour">per Hour</option>
                     <option value="day">per Day</option>
@@ -248,7 +249,7 @@ export const ServiceCatalog = () => {
                 </label>
                 <textarea
                   rows={3}
-                  placeholder="Detail what is included, turnaround timing, and staffing..."
+                  placeholder="Describe the service you offer"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                 />

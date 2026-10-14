@@ -150,7 +150,7 @@ export const Login = () => {
             <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
               <button
                 type="button"
-                onClick={() => fillDemoAccount('customer@eventease.com', 'password123')}
+                onClick={() => fillDemoAccount('customer@eventease.local', 'Password123!')}
                 className="btn btn-outline btn-sm"
                 style={{ fontSize: '0.75rem', padding: '4px 10px' }}
               >
@@ -158,7 +158,7 @@ export const Login = () => {
               </button>
               <button
                 type="button"
-                onClick={() => fillDemoAccount('vendor.lavish@eventease.com', 'password123')}
+                onClick={() => fillDemoAccount('vendor1@eventease.local', 'Password123!')}
                 className="btn btn-outline btn-sm"
                 style={{ fontSize: '0.75rem', padding: '4px 10px' }}
               >
@@ -166,7 +166,7 @@ export const Login = () => {
               </button>
               <button
                 type="button"
-                onClick={() => fillDemoAccount('admin@eventease.com', 'password123')}
+                onClick={() => fillDemoAccount('admin@eventease.local', 'Password123!')}
                 className="btn btn-outline btn-sm"
                 style={{ fontSize: '0.75rem', padding: '4px 10px' }}
               >

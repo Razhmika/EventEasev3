@@ -99,7 +99,7 @@ export const LandingPage = () => {
             maxWidth: '680px',
             margin: '0 auto 36px'
           }}>
-            Connect seamlessly with verified luxury event vendors tailored to your exact budget, aesthetic theme, date, and location through our transparent rule-based recommendation engine.
+            Connect seamlessly with verified local event vendors tailored to your exact budget, celebration style, date, and location through our transparent rule-based recommendation engine.
           </p>
 
           <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', flexWrap: 'wrap' }}>
@@ -125,7 +125,7 @@ export const LandingPage = () => {
           }}>
             <div>
               <h3 style={{ color: 'var(--color-primary-dark)', fontSize: '1.8rem', fontWeight: 800 }}>100%</h3>
-              <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', fontWeight: 600 }}>Verified Artisans</p>
+              <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', fontWeight: 600 }}>Verified Vendors</p>
             </div>
             <div style={{ borderLeft: '1px solid var(--color-border)', borderRight: '1px solid var(--color-border)' }}>
               <h3 style={{ color: 'var(--color-primary-dark)', fontSize: '1.8rem', fontWeight: 800 }}>98%</h3>
@@ -251,7 +251,7 @@ export const LandingPage = () => {
                     <div>
                       <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', display: 'block' }}>Starting from</span>
                       <strong style={{ fontSize: '1.05rem', color: 'var(--color-text-title)' }}>
-                        ${parseFloat(vendor.starting_price).toLocaleString()}
+                        ₹{parseFloat(vendor.starting_price).toLocaleString('en-IN')}
                       </strong>
                     </div>
                     <Link to={`/vendors/${vendor.id}`} className="btn btn-secondary btn-sm">

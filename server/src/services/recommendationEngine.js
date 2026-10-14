@@ -131,17 +131,17 @@ export async function calculateVendorRecommendations(eventId) {
     if (lowestPrice <= allocatedBudget) {
       // Comfortably fits within allocated budget
       budgetScore = 25;
-      budgetReason = `Fits within your ${categoryBudgetMap[primaryMatchedCatId]?.name || 'service'} budget ($${lowestPrice.toLocaleString()} vs $${allocatedBudget.toLocaleString()} allocated).`;
+      budgetReason = `Fits within your ${categoryBudgetMap[primaryMatchedCatId]?.name || 'service'} budget (₹${lowestPrice.toLocaleString('en-IN')} vs ₹${allocatedBudget.toLocaleString('en-IN')} allocated).`;
     } else if (lowestPrice <= allocatedBudget * 1.15) {
       // Slightly higher (within 15% tolerance)
       budgetScore = 18;
-      budgetReason = `Starting service ($${lowestPrice.toLocaleString()}) slightly exceeds allocated budget ($${allocatedBudget.toLocaleString()}) by <15%.`;
+      budgetReason = `Starting service (₹${lowestPrice.toLocaleString('en-IN')}) slightly exceeds allocated budget (₹${allocatedBudget.toLocaleString('en-IN')}) by <15%.`;
     } else if (lowestPrice <= allocatedBudget * 1.30) {
       budgetScore = 10;
-      budgetReason = `Service pricing ($${lowestPrice.toLocaleString()}) is moderately above allocated budget ($${allocatedBudget.toLocaleString()}).`;
+      budgetReason = `Service pricing (₹${lowestPrice.toLocaleString('en-IN')}) is moderately above allocated budget (₹${allocatedBudget.toLocaleString('en-IN')}).`;
     } else {
       budgetScore = 2;
-      budgetReason = `Premium offering ($${lowestPrice.toLocaleString()}) exceeds allocated category budget ($${allocatedBudget.toLocaleString()}).`;
+      budgetReason = `Premium offering (₹${lowestPrice.toLocaleString('en-IN')}) exceeds allocated category budget (₹${allocatedBudget.toLocaleString('en-IN')}).`;
     }
 
     // --- RULE 3: LOCATION & COVERAGE (15 Points Max) ---
@@ -154,7 +154,7 @@ export async function calculateVendorRecommendations(eventId) {
       locationScore = 15;
       locationReason = `Based directly in ${vendor.city}, providing immediate local coverage.`;
     } else {
-      // Nearby Bay Area city assumption
+      // Regional Tamil Nadu coverage
       locationScore = 11;
       locationReason = `Based in ${vendor.city} with coverage radius of ${vendor.service_radius_km} km encompassing ${event.city}.`;
     }

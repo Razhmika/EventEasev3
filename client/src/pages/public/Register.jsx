@@ -253,7 +253,7 @@ export const Register = () => {
               <input
                 type="text"
                 required
-                placeholder="San Francisco, CA"
+                placeholder="Coimbatore"
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
               />
@@ -268,7 +268,7 @@ export const Register = () => {
                   </label>
                   <input
                     type="text"
-                    placeholder="e.g. Lavender Glow, French Minimalist, Modern Estate"
+                    placeholder="e.g. Traditional Tamil Wedding, Modern Reception, Floral Stage"
                     value={preferredTheme}
                     onChange={(e) => setPreferredTheme(e.target.value)}
                   />
@@ -278,9 +278,9 @@ export const Register = () => {
                     Typical Budget Tier
                   </label>
                   <select value={budgetTier} onChange={(e) => setBudgetTier(e.target.value)}>
-                    <option value="Intimate / Accessible">Intimate / Accessible (&lt;$10k)</option>
-                    <option value="Mid-to-High">Mid-to-High ($10k - $30k)</option>
-                    <option value="Luxury / Haute">Luxury / Haute ($30k+)</option>
+                    <option value="Intimate / Accessible">Budget / Intimate (Under ₹50,000)</option>
+                    <option value="Mid-to-High">Standard / Mid-Range (₹50,000 - ₹2,00,000)</option>
+                    <option value="Luxury / Haute">Grand / Luxury (₹2,00,000+)</option>
                   </select>
                 </div>
               </>
@@ -296,7 +296,7 @@ export const Register = () => {
                   <input
                     type="text"
                     required
-                    placeholder="e.g. Celestial Blooms Studio"
+                    placeholder="e.g. Right Studio Photography"
                     value={businessName}
                     onChange={(e) => setBusinessName(e.target.value)}
                   />
@@ -319,12 +319,12 @@ export const Register = () => {
                   </div>
                   <div>
                     <label style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--color-text-title)', display: 'block', marginBottom: '4px' }}>
-                      Starting Price ($) *
+                      Starting Price (₹) *
                     </label>
                     <input
                       type="number"
                       required
-                      placeholder="1500"
+                      placeholder="10000"
                       value={startingPrice}
                       onChange={(e) => setStartingPrice(e.target.value)}
                     />
@@ -337,7 +337,7 @@ export const Register = () => {
                   </label>
                   <textarea
                     rows={3}
-                    placeholder="Describe your craft, experience, and what sets your creations apart..."
+                    placeholder="Describe the services you offer..."
                     value={bio}
                     onChange={(e) => setBio(e.target.value)}
                   />

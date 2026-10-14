@@ -68,7 +68,7 @@ export const AdminVendors = () => {
                       <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>{v.email}</span>
                     </td>
                     <td style={{ padding: '12px' }}>{v.city}</td>
-                    <td style={{ padding: '12px', fontWeight: 600 }}>${parseFloat(v.starting_price).toLocaleString()}</td>
+                    <td style={{ padding: '12px', fontWeight: 600 }}>₹{parseFloat(v.starting_price).toLocaleString('en-IN')}</td>
                     <td style={{ padding: '12px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                         <Star size={13} fill="#6240A0" color="#6240A0" /> {parseFloat(v.average_rating).toFixed(2)} ({v.review_count})

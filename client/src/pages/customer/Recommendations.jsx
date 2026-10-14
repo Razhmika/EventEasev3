@@ -129,7 +129,7 @@ export const Recommendations = () => {
             </span>
             <h1 style={{ fontSize: '2.1rem', margin: '4px 0 8px' }}>{event.title}</h1>
             <p style={{ color: 'var(--color-text-body)', fontSize: '0.95rem' }}>
-              Scheduled for <strong>{event.event_date}</strong> in <strong>{event.city}</strong> &bull; Total Budget: <strong>${parseFloat(event.total_budget).toLocaleString()}</strong> &bull; {event.guest_count} Guests
+              Scheduled for <strong>{event.event_date}</strong> in <strong>{event.city}</strong> &bull; Total Budget: <strong>₹{parseFloat(event.total_budget).toLocaleString('en-IN')}</strong> &bull; {event.guest_count} Guests
             </p>
           </div>
           <Link to={`/customer/events`} className="btn btn-outline btn-sm">
@@ -161,7 +161,7 @@ export const Recommendations = () => {
       <div>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
           <h2 style={{ fontSize: '1.4rem' }}>
-            {recommendations.length} Matched Artisans
+            {recommendations.length} Matched Vendors
           </h2>
         </div>
 
@@ -216,7 +216,7 @@ export const Recommendations = () => {
                         <Star size={13} fill="#6240A0" color="#6240A0" /> {parseFloat(vendor.averageRating).toFixed(2)} ({vendor.reviewCount} reviews)
                       </span>
                       <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--color-text-title)', fontWeight: 600 }}>
-                        <DollarSign size={13} /> Starts at ${parseFloat(vendor.startingPrice).toLocaleString()}
+                        <DollarSign size={13} /> Starts at ₹{parseFloat(vendor.startingPrice).toLocaleString('en-IN')}
                       </span>
                     </div>
 
@@ -342,7 +342,7 @@ export const Recommendations = () => {
 
                 <div>
                   <label style={{ fontSize: '0.8rem', fontWeight: 600, display: 'block', marginBottom: '4px' }}>
-                    Proposed Budget / Offer ($)
+                    Proposed Budget / Offer (₹)
                   </label>
                   <input
                     type="number"

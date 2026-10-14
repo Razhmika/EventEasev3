@@ -104,7 +104,7 @@ export const AdminDashboard = () => {
           <div>
             <span style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', fontWeight: 600 }}>Gross Volume</span>
             <h3 style={{ fontSize: '1.6rem', color: 'var(--color-text-title)' }}>
-              ${parseFloat(stats?.grossVolume || 0).toLocaleString()}
+              ₹{parseFloat(stats?.grossVolume || 0).toLocaleString('en-IN')}
             </h3>
           </div>
         </div>
@@ -140,7 +140,7 @@ export const AdminDashboard = () => {
                     <td style={{ padding: '12px', fontWeight: 600, color: 'var(--color-text-title)' }}>{b.event_title}</td>
                     <td style={{ padding: '12px' }}>{b.customer_name}</td>
                     <td style={{ padding: '12px', color: 'var(--color-primary-dark)', fontWeight: 600 }}>{b.business_name}</td>
-                    <td style={{ padding: '12px', fontWeight: 700 }}>${parseFloat(b.quote_amount || 0).toLocaleString()}</td>
+                    <td style={{ padding: '12px', fontWeight: 700 }}>₹{parseFloat(b.quote_amount || 0).toLocaleString('en-IN')}</td>
                     <td style={{ padding: '12px' }}>
                       <span className={`badge badge-${b.status}`}>
                         {b.status.toUpperCase()}

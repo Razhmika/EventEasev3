@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { User, Mail, Phone, MapPin, Sparkles, DollarSign, CheckCircle2, Image as ImageIcon } from 'lucide-react';
 import api from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
@@ -195,7 +195,7 @@ export const CustomerProfile = () => {
               </label>
               <input
                 type="text"
-                placeholder="e.g. Mumbai, Maharashtra"
+                placeholder="e.g. Coimbatore, Tamil Nadu"
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
               />
@@ -227,7 +227,10 @@ export const CustomerProfile = () => {
                 </label>
                 <select value={preferredTheme} onChange={(e) => setPreferredTheme(e.target.value)}>
                   <option value="">Select an Aesthetic</option>
-                  <option value="Traditional Royal & Heritage">Traditional Royal & Heritage</option>
+                  <option value="Traditional Tamil Wedding & Floral Decor">Traditional Tamil Wedding & Floral Decor</option>
+                  <option value="Modern Wedding Reception">Modern Wedding Reception</option>
+                  <option value="Simple Birthday Celebration">Simple Birthday Celebration</option>
+                  <option value="Floral Wedding Decoration">Floral Wedding Decoration</option>
                   <option value="Modern Minimalist Elegance">Modern Minimalist Elegance</option>
                   <option value="Bohemian Sunset Garden">Bohemian Sunset Garden</option>
                   <option value="Luxury Grandeur & Glamour">Luxury Grandeur & Glamour</option>

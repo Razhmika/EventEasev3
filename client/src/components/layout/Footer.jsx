@@ -36,7 +36,7 @@ export const Footer = () => {
               </span>
             </div>
             <p style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)', lineHeight: 1.6 }}>
-              The premier AI-powered event booking and management ecosystem connecting visionaries with world-class artisans.
+              The premier AI-powered event booking platform connecting customers with trusted local event vendors across Coimbatore and Tamil Nadu.
             </p>
           </div>
 
@@ -52,10 +52,10 @@ export const Footer = () => {
           <div>
             <h4 style={{ fontSize: '0.95rem', marginBottom: '16px', color: 'var(--color-text-title)' }}>Categories</h4>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '0.875rem' }}>
-              <Link to="/vendors?category=catering">Catering & Dining</Link>
-              <Link to="/vendors?category=photography">Photography & Cinema</Link>
-              <Link to="/vendors?category=venues">Venues & Mansions</Link>
-              <Link to="/vendors?category=decor-floral">Floral & Decor Design</Link>
+              <Link to="/vendors?category=catering">Catering & Food Services</Link>
+              <Link to="/vendors?category=photography">Photography & Videography</Link>
+              <Link to="/vendors?category=venues">Marriage Halls & Venues</Link>
+              <Link to="/vendors?category=decor-floral">Stage & Flower Decoration</Link>
             </div>
           </div>
 

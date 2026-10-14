@@ -11,14 +11,14 @@ export const CreateEvent = () => {
 
   // Form Fields
   const [title, setTitle] = useState('');
-  const [eventType, setEventType] = useState('Wedding & Reception');
+  const [eventType, setEventType] = useState('Wedding');
   const [eventDate, setEventDate] = useState('');
-  const [eventTime, setEventTime] = useState('17:00');
+  const [eventTime, setEventTime] = useState('18:00');
   const [location, setLocation] = useState('');
-  const [city, setCity] = useState('San Francisco');
-  const [guestCount, setGuestCount] = useState('100');
-  const [totalBudget, setTotalBudget] = useState('20000');
-  const [themeStyle, setThemeStyle] = useState('Lavender Glow & Candlelit Elegance');
+  const [city, setCity] = useState('Coimbatore');
+  const [guestCount, setGuestCount] = useState('250');
+  const [totalBudget, setTotalBudget] = useState('150000');
+  const [themeStyle, setThemeStyle] = useState('Traditional Tamil Wedding');
   const [description, setDescription] = useState('');
 
   // Selected Service Requirements
@@ -31,8 +31,8 @@ export const CreateEvent = () => {
         // Default with first 2 categories
         if (res.data.length >= 2) {
           setRequirements([
-            { categoryId: res.data[0].id, allocatedBudget: '7000', specialRequests: '' },
-            { categoryId: res.data[1].id, allocatedBudget: '3000', specialRequests: '' }
+            { categoryId: res.data[0].id, allocatedBudget: '50000', specialRequests: '' },
+            { categoryId: res.data[1].id, allocatedBudget: '25000', specialRequests: '' }
           ]);
         }
       }
@@ -197,7 +197,7 @@ export const CreateEvent = () => {
               <input
                 type="text"
                 required
-                placeholder="San Francisco"
+                placeholder="Coimbatore"
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
               />
@@ -220,7 +220,7 @@ export const CreateEvent = () => {
             </div>
             <div>
               <label style={{ fontSize: '0.85rem', fontWeight: 600, display: 'block', marginBottom: '6px' }}>
-                Total Estimated Budget ($) *
+                Total Estimated Budget (₹) *
               </label>
               <input
                 type="number"
@@ -284,11 +284,11 @@ export const CreateEvent = () => {
 
                 <div>
                   <label style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--color-text-title)', display: 'block', marginBottom: '4px' }}>
-                    Budget Allocation ($)
+                    Budget Allocation (₹)
                   </label>
                   <input
                     type="number"
-                    placeholder="3000"
+                    placeholder="25000"
                     value={req.allocatedBudget}
                     onChange={(e) => handleRequirementChange(idx, 'allocatedBudget', e.target.value)}
                   />
@@ -300,7 +300,7 @@ export const CreateEvent = () => {
                   </label>
                   <input
                     type="text"
-                    placeholder="e.g. 5-course banquet with wine pairings"
+                    placeholder="e.g. Traditional banana leaf feast with live counters"
                     value={req.specialRequests}
                     onChange={(e) => handleRequirementChange(idx, 'specialRequests', e.target.value)}
                   />

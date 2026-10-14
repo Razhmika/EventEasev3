@@ -189,7 +189,7 @@ export const VendorProfileSettings = () => {
 
           <div>
             <label style={{ fontSize: '0.8rem', fontWeight: 600, display: 'block', marginBottom: '4px' }}>
-              Minimum Starting Price ($) *
+              Minimum Starting Price (₹) *
             </label>
             <input
               type="number"

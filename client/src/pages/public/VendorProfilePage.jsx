@@ -597,7 +597,7 @@ export const VendorProfilePage = () => {
                     <input
                       type="text"
                       required
-                      placeholder="e.g. Priya & Rahul Wedding Reception"
+                      placeholder="e.g. Arjun's Wedding Reception"
                       value={eventName}
                       onChange={(e) => setEventName(e.target.value)}
                     />
@@ -610,10 +610,12 @@ export const VendorProfilePage = () => {
                     <select value={eventType} onChange={(e) => setEventType(e.target.value)} required>
                       <option value="Wedding">Wedding</option>
                       <option value="Reception">Reception</option>
-                      <option value="Birthday">Birthday</option>
-                      <option value="Corporate">Corporate Gala</option>
-                      <option value="Anniversary">Anniversary</option>
-                      <option value="Cocktail Party">Cocktail Party</option>
+                      <option value="Engagement">Engagement Ceremony</option>
+                      <option value="Birthday">Birthday Celebration</option>
+                      <option value="Anniversary">Family Anniversary</option>
+                      <option value="Housewarming">Housewarming Function</option>
+                      <option value="Corporate">Corporate Annual Day</option>
+                      <option value="College Cultural">College Cultural Fest</option>
                       <option value="Other">Other Special Occasion</option>
                     </select>
                   </div>
@@ -653,7 +655,7 @@ export const VendorProfilePage = () => {
                     </label>
                     <input
                       type="text"
-                      placeholder="e.g. Royal Palace Ballroom or Private Residence"
+                      placeholder="Enter event location (e.g. Kongu Mahal, Avinashi Road)"
                       value={venueLocation}
                       onChange={(e) => setVenueLocation(e.target.value)}
                     />
@@ -665,7 +667,7 @@ export const VendorProfilePage = () => {
                     </label>
                     <input
                       type="text"
-                      placeholder="e.g. Mumbai"
+                      placeholder="Coimbatore"
                       value={eventCity}
                       onChange={(e) => setEventCity(e.target.value)}
                     />
@@ -680,7 +682,7 @@ export const VendorProfilePage = () => {
                     </label>
                     <input
                       type="number"
-                      placeholder="e.g. 150"
+                      placeholder="e.g. 250"
                       value={guestCount}
                       onChange={(e) => setGuestCount(e.target.value)}
                     />
@@ -706,7 +708,7 @@ export const VendorProfilePage = () => {
                   </label>
                   <textarea
                     rows={3}
-                    placeholder="Share any special vision details, color palette, or requirements..."
+                    placeholder="Share any special vision details, decoration style, or requirements..."
                     value={customerNotes}
                     onChange={(e) => setCustomerNotes(e.target.value)}
                   />

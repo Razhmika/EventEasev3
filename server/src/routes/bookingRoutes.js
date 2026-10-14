@@ -11,6 +11,7 @@ const router = Router();
 router.use(verifyToken);
 
 router.get('/', getMyBookings);
+router.get('/my-bookings', getMyBookings);
 router.post('/', createBooking);
 router.put('/:id/status', updateBookingStatus);
 

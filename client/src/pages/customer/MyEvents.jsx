@@ -123,7 +123,7 @@ export const MyEvents = () => {
                 </div>
                 <div>
                   <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', display: 'block' }}>Allocated Budget</span>
-                  <strong style={{ fontSize: '0.9rem' }}>${parseFloat(evt.total_budget).toLocaleString()}</strong>
+                  <strong style={{ fontSize: '0.9rem' }}>₹{parseFloat(evt.total_budget).toLocaleString('en-IN')}</strong>
                 </div>
                 <div>
                   <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', display: 'block' }}>Requirements</span>

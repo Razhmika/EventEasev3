@@ -121,7 +121,7 @@ export const VendorDashboard = () => {
           <div>
             <span style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', fontWeight: 600 }}>Active Bookings Value</span>
             <h3 style={{ fontSize: '1.6rem', color: 'var(--color-text-title)' }}>
-              ${totalRevenue.toLocaleString()}
+              ₹{totalRevenue.toLocaleString('en-IN')}
             </h3>
           </div>
         </div>
@@ -189,7 +189,7 @@ export const VendorDashboard = () => {
 
                 <div style={{ textAlign: 'right' }}>
                   <div style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--color-text-title)' }}>
-                    ${parseFloat(b.quote_amount || 0).toLocaleString()}
+                    ₹{parseFloat(b.quote_amount || 0).toLocaleString('en-IN')}
                   </div>
                   <Link to="/vendor/bookings" className="btn btn-outline btn-sm" style={{ marginTop: '6px' }}>
                     Review Inquiry

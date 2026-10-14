@@ -57,10 +57,11 @@ export const CustomerDashboard = () => {
     { label: '💍 Wedding', query: 'eventType=Wedding' },
     { label: '🍽️ Catering', query: 'category=catering' },
     { label: '📸 Photography', query: 'category=photography' },
-    { label: '✨ Decoration', query: 'category=decoration' },
-    { label: '🏰 Venue', query: 'category=venues' },
+    { label: '✨ Decoration', query: 'category=decor-floral' },
+    { label: '🏰 Marriage Hall', query: 'category=venues' },
+    { label: '💄 Bridal Makeup', query: 'category=bridal-makeup' },
     { label: '🎂 Birthday', query: 'eventType=Birthday' },
-    { label: '🎵 DJ & Music', query: 'category=dj-music' }
+    { label: '🎵 DJ & Music', query: 'category=music-dj' }
   ];
 
   return (
@@ -80,13 +81,13 @@ export const CustomerDashboard = () => {
       }}>
         <div>
           <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--color-primary-dark)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-            Event Marketplace Sanctuary
+            Event Booking Marketplace
           </span>
           <h1 style={{ fontSize: '2.2rem', margin: '4px 0 8px', color: 'var(--color-text-title)' }}>
             Welcome back, {user?.firstName}!
           </h1>
           <p style={{ color: 'var(--color-text-body)', fontSize: '1rem', maxWidth: '540px', margin: 0 }}>
-            {user?.profile?.city ? `Exploring verified wedding & event vendors in ${user.profile.city}.` : 'Discover vetted artisans, explore their showcase portfolios, and book directly.'}
+            {user?.profile?.city ? `Exploring verified wedding & event vendors in ${user.profile.city}.` : 'Discover top local vendors, explore their showcase portfolios, and book directly.'}
           </p>
         </div>
 
@@ -113,7 +114,7 @@ export const CustomerDashboard = () => {
             Find the Perfect Vendors for Your Event
           </h2>
           <p style={{ color: 'var(--color-text-body)', fontSize: '1rem' }}>
-            Search verified venues, gourmet caterers, cinematographers, decorators, and performers.
+            Search photography, catering, wedding decoration, marriage halls, makeup artists, and DJs.
           </p>
         </div>
 
@@ -132,7 +133,7 @@ export const CustomerDashboard = () => {
             <Search size={22} color="var(--color-primary-dark)" style={{ flexShrink: 0 }} />
             <input
               type="text"
-              placeholder="Search wedding, catering, photography, venues, decorators..."
+              placeholder="Search wedding, catering, photography, venues..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               style={{

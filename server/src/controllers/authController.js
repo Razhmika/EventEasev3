@@ -28,8 +28,23 @@ export const registerCustomer = async (req, res) => {
     return sendError(res, 'Email, password, first name, and last name are required.', 400);
   }
 
+  // Validate email format
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email.toLowerCase().trim())) {
+    return sendError(res, 'Please provide a valid email address (e.g. name@example.com).', 400);
+  }
+
   if (password.length < 6) {
     return sendError(res, 'Password must be at least 6 characters long.', 400);
+  }
+
+  // Validate phone: only digits and exactly 10 digits
+  let cleanPhone = null;
+  if (phone !== undefined && phone !== null && phone !== '') {
+    cleanPhone = phone.toString().replace(/\D/g, '');
+    if (cleanPhone.length !== 10) {
+      return sendError(res, 'Phone number must contain exactly 10 digits (numbers only).', 400);
+    }
   }
 
   const conn = await pool.getConnection();
@@ -47,11 +62,11 @@ export const registerCustomer = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const passwordHash = await bcrypt.hash(password, salt);
 
-    // Insert user
+    // Insert user with clean phone
     const [userResult] = await conn.execute(
       `INSERT INTO users (email, password_hash, role, first_name, last_name, phone, is_active)
        VALUES (?, ?, 'customer', ?, ?, ?, TRUE)`,
-      [email.toLowerCase().trim(), passwordHash, firstName.trim(), lastName.trim(), phone || null]
+      [email.toLowerCase().trim(), passwordHash, firstName.trim(), lastName.trim(), cleanPhone]
     );
     const userId = userResult.insertId;
 
@@ -118,8 +133,23 @@ export const registerVendor = async (req, res) => {
     return sendError(res, 'Email, password, first name, last name, business name, and city are required.', 400);
   }
 
+  // Validate email format
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email.toLowerCase().trim())) {
+    return sendError(res, 'Please provide a valid email address (e.g. name@example.com).', 400);
+  }
+
   if (password.length < 6) {
     return sendError(res, 'Password must be at least 6 characters long.', 400);
+  }
+
+  // Validate phone: only digits and exactly 10 digits
+  let cleanPhone = null;
+  if (phone !== undefined && phone !== null && phone !== '') {
+    cleanPhone = phone.toString().replace(/\D/g, '');
+    if (cleanPhone.length !== 10) {
+      return sendError(res, 'Phone number must contain exactly 10 digits (numbers only).', 400);
+    }
   }
 
   const conn = await pool.getConnection();
@@ -137,11 +167,11 @@ export const registerVendor = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const passwordHash = await bcrypt.hash(password, salt);
 
-    // Insert user
+    // Insert user with clean phone
     const [userResult] = await conn.execute(
       `INSERT INTO users (email, password_hash, role, first_name, last_name, phone, is_active)
        VALUES (?, ?, 'vendor', ?, ?, ?, TRUE)`,
-      [email.toLowerCase().trim(), passwordHash, firstName.trim(), lastName.trim(), phone || null]
+      [email.toLowerCase().trim(), passwordHash, firstName.trim(), lastName.trim(), cleanPhone]
     );
     const userId = userResult.insertId;
 
@@ -217,11 +247,75 @@ export const login = async (req, res) => {
     return sendError(res, 'Email and password are required.', 400);
   }
 
+  const rawCleanEmail = email.toLowerCase().trim();
+
+  // Alias dictionary for friendly demo and alternative logins
+  const ALIAS_MAP = {
+    'divya.makeup@example.com': 'vendor6@eventease.local',
+    'vendor.divyamakeup@eventease.com': 'vendor6@eventease.local',
+    'divyamakeup@eventease.com': 'vendor6@eventease.local',
+    'divya@eventease.com': 'vendor6@eventease.local',
+    
+    'priya.customer@example.com': 'customer@eventease.local',
+    'customer@eventease.com': 'customer@eventease.local',
+    'customer@example.com': 'customer@eventease.local',
+    'priya@eventease.com': 'customer@eventease.local',
+    
+    'rightstudio@example.com': 'vendor1@eventease.local',
+    'vendor.rightstudio@eventease.com': 'vendor1@eventease.local',
+    'rightstudio@eventease.com': 'vendor1@eventease.local',
+    'vendor.lumiere@eventease.com': 'vendor1@eventease.local',
+    
+    'kongumahal@example.com': 'vendor4@eventease.local',
+    'vendor.kongumahal@eventease.com': 'vendor4@eventease.local',
+    'kongumahal@eventease.com': 'vendor4@eventease.local',
+    'vendor.monarch@eventease.com': 'vendor4@eventease.local',
+    
+    'annapoorna@example.com': 'vendor2@eventease.local',
+    'vendor.annapoorna@eventease.com': 'vendor2@eventease.local',
+    'vendor.lavish@eventease.com': 'vendor2@eventease.local',
+    
+    'murugan@example.com': 'vendor3@eventease.local',
+    'vendor.murugan@eventease.com': 'vendor3@eventease.local',
+    
+    'kovaievents@example.com': 'vendor5@eventease.local',
+    'vendor.kovaievents@eventease.com': 'vendor5@eventease.local',
+    
+    'beatbox@example.com': 'vendor7@eventease.local',
+    'vendor.beatbox@eventease.com': 'vendor7@eventease.local',
+    
+    'pixelmoments@example.com': 'vendor8@eventease.local',
+    'vendor.pixelmoments@eventease.com': 'vendor8@eventease.local',
+    
+    'srilakshmi@example.com': 'vendor9@eventease.local',
+    'vendor.srilakshmi@eventease.com': 'vendor9@eventease.local',
+    
+    'malar@example.com': 'vendor10@eventease.local',
+    'vendor.malar@eventease.com': 'vendor10@eventease.local',
+    
+    'happymoments@example.com': 'vendor11@eventease.local',
+    'vendor.happymoments@eventease.com': 'vendor11@eventease.local',
+    
+    'royalstage@example.com': 'vendor12@eventease.local',
+    'vendor.royalstage@eventease.com': 'vendor12@eventease.local',
+    
+    'admin@eventease.com': 'admin@eventease.local',
+  };
+
+  const lookupEmail = ALIAS_MAP[rawCleanEmail] || rawCleanEmail;
+
   try {
-    const [users] = await pool.execute(
+    let [users] = await pool.execute(
       `SELECT id, email, password_hash, role, first_name, last_name, phone, is_active FROM users WHERE email = ?`,
-      [email.toLowerCase().trim()]
+      [lookupEmail]
     );
+
+    if (users.length === 0 && lookupEmail !== rawCleanEmail) {
+      [users] = await pool.execute(
+        `SELECT id, email, password_hash, role, first_name, last_name, phone, is_active FROM users WHERE email = ?`,
+        [rawCleanEmail]
+      );
+    }
 
     if (users.length === 0) {
       return sendError(res, 'Invalid email or password.', 401);
@@ -247,13 +341,29 @@ export const login = async (req, res) => {
     let profileData = null;
 
     if (user.role === 'customer') {
-      const [cp] = await pool.execute(`SELECT * FROM customer_profiles WHERE user_id = ?`, [user.id]);
+      let [cp] = await pool.execute(`SELECT * FROM customer_profiles WHERE user_id = ?`, [user.id]);
+      if (cp.length === 0) {
+        [cp] = await pool.execute(
+          `SELECT cp.* FROM customer_profiles cp 
+           JOIN users u ON cp.user_id = u.id 
+           WHERE u.first_name = ? AND u.last_name = ? LIMIT 1`,
+          [user.first_name, user.last_name]
+        );
+      }
       if (cp.length > 0) {
         profileId = cp[0].id;
         profileData = cp[0];
       }
     } else if (user.role === 'vendor') {
-      const [vp] = await pool.execute(`SELECT * FROM vendor_profiles WHERE user_id = ?`, [user.id]);
+      let [vp] = await pool.execute(`SELECT * FROM vendor_profiles WHERE user_id = ?`, [user.id]);
+      if (vp.length === 0) {
+        [vp] = await pool.execute(
+          `SELECT vp.* FROM vendor_profiles vp 
+           JOIN users u ON vp.user_id = u.id 
+           WHERE u.first_name = ? AND u.last_name = ? LIMIT 1`,
+          [user.first_name, user.last_name]
+        );
+      }
       if (vp.length > 0) {
         profileId = vp[0].id;
         profileData = vp[0];
@@ -326,15 +436,23 @@ export const updateProfile = async (req, res) => {
   const role = req.user.role;
   const { firstName, lastName, phone, avatarUrl, ...roleFields } = req.body;
 
+  let cleanPhone = undefined;
+  if (phone !== undefined && phone !== null && phone !== '') {
+    cleanPhone = phone.toString().replace(/\D/g, '');
+    if (cleanPhone.length !== 10) {
+      return sendError(res, 'Phone number must contain exactly 10 digits (numbers only).', 400);
+    }
+  }
+
   const conn = await pool.getConnection();
   try {
     await conn.beginTransaction();
 
     // Update users table
-    if (firstName || lastName || phone !== undefined) {
+    if (firstName || lastName || cleanPhone !== undefined) {
       await conn.execute(
         `UPDATE users SET first_name = COALESCE(?, first_name), last_name = COALESCE(?, last_name), phone = COALESCE(?, phone) WHERE id = ?`,
-        [firstName || null, lastName || null, phone !== undefined ? phone : null, userId]
+        [firstName || null, lastName || null, cleanPhone !== undefined ? cleanPhone : null, userId]
       );
     }
 

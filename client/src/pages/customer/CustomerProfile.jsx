@@ -32,16 +32,35 @@ export const CustomerProfile = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setSaving(true);
     setSuccessMsg('');
     setErrorMsg('');
 
+    // Name validation
+    if (!firstName.trim() || !lastName.trim()) {
+      setErrorMsg('First name and last name are required.');
+      return;
+    }
+
+    if (!/^[a-zA-Z\s'-]+$/.test(firstName.trim()) || !/^[a-zA-Z\s'-]+$/.test(lastName.trim())) {
+      setErrorMsg('First name and last name must contain only letters.');
+      return;
+    }
+
+    // Phone validation: numbers only and exactly 10 digits
+    const cleanPhone = phone.replace(/\D/g, '');
+    if (cleanPhone && cleanPhone.length !== 10) {
+      setErrorMsg('Phone number must contain exactly 10 digits (numbers only).');
+      return;
+    }
+
+    setSaving(true);
+
     try {
       const payload = {
-        firstName,
-        lastName,
-        phone,
-        city,
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        phone: cleanPhone || null,
+        city: city.trim(),
         preferredTheme,
         budgetTier,
         avatarUrl
@@ -143,7 +162,7 @@ export const CustomerProfile = () => {
                 type="text"
                 required
                 value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
+                onChange={(e) => setFirstName(e.target.value.replace(/[^a-zA-Z\s'-]/g, ''))}
               />
             </div>
 
@@ -155,7 +174,7 @@ export const CustomerProfile = () => {
                 type="text"
                 required
                 value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
+                onChange={(e) => setLastName(e.target.value.replace(/[^a-zA-Z\s'-]/g, ''))}
               />
             </div>
           </div>
@@ -175,14 +194,29 @@ export const CustomerProfile = () => {
             </div>
 
             <div>
-              <label style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--color-text-title)', display: 'block', marginBottom: '6px' }}>
-                Phone Number
-              </label>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                <label style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--color-text-title)', display: 'block' }}>
+                  Phone Number
+                </label>
+                <span style={{
+                  fontSize: '0.75rem',
+                  fontWeight: 600,
+                  color: phone.length === 10 ? 'var(--color-success)' : phone.length > 0 ? 'var(--color-danger)' : 'var(--color-text-muted)'
+                }}>
+                  {phone.length === 10 ? '✓ 10 digits' : `${phone.length}/10 digits`}
+                </span>
+              </div>
               <input
                 type="tel"
-                placeholder="+91 98765 43210"
+                maxLength={10}
+                inputMode="numeric"
+                pattern="[0-9]{10}"
+                placeholder="9842212345"
                 value={phone}
-                onChange={(e) => setPhone(e.target.value)}
+                onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                style={{
+                  borderColor: phone && phone.length !== 10 ? 'var(--color-danger)' : undefined
+                }}
               />
             </div>
           </div>

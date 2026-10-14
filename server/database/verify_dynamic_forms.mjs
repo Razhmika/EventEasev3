@@ -56,12 +56,12 @@ async function runTests() {
 
   // 3. Test Bridal Makeup Booking (Divya Bridal Makeup Studio)
   console.log('3️⃣ Testing Bridal Makeup Dynamic Booking (People breakdown, Looks, Ready Time)...');
-  const uniqueDay1 = Math.floor(10 + Math.random() * 18);
+  const testDate1 = new Date(Date.now() + 86400000 * (150 + Math.floor(Math.random() * 500))).toISOString().split('T')[0];
   const makeupPayload = {
     vendorId: makeupVendorId,
     eventName: "Ananya's Muhurtham & Reception",
     eventType: 'Wedding',
-    eventDate: `2027-03-${String(uniqueDay1)}`,
+    eventDate: testDate1,
     eventTime: '06:30:00',
     serviceRequirements: {
       category: 'bridal-makeup',
@@ -89,12 +89,12 @@ async function runTests() {
   console.log('   Confirmed: No generic 500-guest count forced on customer for makeup!\n');
 
   // 4. Test Marriage Hall / Venue Booking (Kongu Mahal)
-  const uniqueDay2 = Math.floor(10 + Math.random() * 18);
+  const testDate2 = new Date(Date.now() + 86400000 * (150 + Math.floor(Math.random() * 500))).toISOString().split('T')[0];
   const venuePayload = {
     vendorId: venueVendorId,
     eventName: 'Karthik & Meera Wedding Celebration',
     eventType: 'Wedding',
-    eventDate: `2027-04-${String(uniqueDay2)}`,
+    eventDate: testDate2,
     eventTime: '05:00:00',
     // Customer does NOT re-enter address — venue address is automatically reused!
     serviceRequirements: {
@@ -134,7 +134,7 @@ async function runTests() {
     vendorId: caterVendorId,
     eventName: 'Karthik & Meera Wedding Feast',
     eventType: 'Wedding',
-    eventDate: `2027-04-${String(uniqueDay2)}`,
+    eventDate: testDate2,
     eventTime: '12:30:00',
     location: 'Kongu Mahal Dining Hall, Avinashi Road, Coimbatore',
     serviceRequirements: {

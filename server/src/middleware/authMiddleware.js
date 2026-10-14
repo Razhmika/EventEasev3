@@ -27,10 +27,26 @@ export const verifyToken = async (req, res, next) => {
     // Fetch corresponding profile ID
     let profileId = null;
     if (user.role === 'customer') {
-      const [cp] = await pool.execute(`SELECT id FROM customer_profiles WHERE user_id = ?`, [user.id]);
+      let [cp] = await pool.execute(`SELECT id FROM customer_profiles WHERE user_id = ?`, [user.id]);
+      if (cp.length === 0) {
+        [cp] = await pool.execute(
+          `SELECT cp.id FROM customer_profiles cp 
+           JOIN users u ON cp.user_id = u.id 
+           WHERE u.first_name = ? AND u.last_name = ? LIMIT 1`,
+          [user.first_name, user.last_name]
+        );
+      }
       if (cp.length > 0) profileId = cp[0].id;
     } else if (user.role === 'vendor') {
-      const [vp] = await pool.execute(`SELECT id, verification_status FROM vendor_profiles WHERE user_id = ?`, [user.id]);
+      let [vp] = await pool.execute(`SELECT id, verification_status FROM vendor_profiles WHERE user_id = ?`, [user.id]);
+      if (vp.length === 0) {
+        [vp] = await pool.execute(
+          `SELECT vp.id, vp.verification_status FROM vendor_profiles vp 
+           JOIN users u ON vp.user_id = u.id 
+           WHERE u.first_name = ? AND u.last_name = ? LIMIT 1`,
+          [user.first_name, user.last_name]
+        );
+      }
       if (vp.length > 0) {
         profileId = vp[0].id;
         user.verification_status = vp[0].verification_status;

@@ -904,13 +904,12 @@ const DynamicBookingModal = ({
                           Expected Guest Count * (Capacity Planning)
                         </label>
                         <input
-                          type="number"
+                          type="text"
                           required
-                          min="50"
-                          max="5000"
+                          inputMode="numeric"
                           placeholder="e.g. 400"
                           value={venueGuestCount}
-                          onChange={(e) => setVenueGuestCount(e.target.value)}
+                          onChange={(e) => setVenueGuestCount(e.target.value.replace(/\D/g, ''))}
                         />
                         <span style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', display: 'block', marginTop: '2px' }}>
                           Essential for seating and dining hall allotment.
@@ -1054,13 +1053,12 @@ const DynamicBookingModal = ({
                           Expected Plates / Guests *
                         </label>
                         <input
-                          type="number"
+                          type="text"
                           required
-                          min="20"
-                          max="10000"
+                          inputMode="numeric"
                           placeholder="e.g. 350"
                           value={cateringPlates}
-                          onChange={(e) => setCateringPlates(e.target.value)}
+                          onChange={(e) => setCateringPlates(e.target.value.replace(/\D/g, ''))}
                         />
                         <span style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)' }}>Essential for pricing</span>
                       </div>
@@ -1376,10 +1374,11 @@ const DynamicBookingModal = ({
                       Proposed Budget / Offer (₹ INR)
                     </label>
                     <input
-                      type="number"
+                      type="text"
+                      inputMode="numeric"
                       placeholder={`e.g. ${vendor.starting_price || 25000}`}
                       value={quoteAmount}
-                      onChange={(e) => setQuoteAmount(e.target.value)}
+                      onChange={(e) => setQuoteAmount(e.target.value.replace(/\D/g, ''))}
                     />
                     <span style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', display: 'block', marginTop: '2px' }}>
                       Vendor starting price: ₹{parseFloat(vendor.starting_price || 0).toLocaleString('en-IN')}

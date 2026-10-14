@@ -180,10 +180,11 @@ export const VendorProfileSettings = () => {
               Service Radius (km) *
             </label>
             <input
-              type="number"
+              type="text"
               required
+              inputMode="numeric"
               value={serviceRadiusKm}
-              onChange={(e) => setServiceRadiusKm(e.target.value)}
+              onChange={(e) => setServiceRadiusKm(e.target.value.replace(/\D/g, ''))}
             />
           </div>
 
@@ -192,10 +193,11 @@ export const VendorProfileSettings = () => {
               Minimum Starting Price (₹) *
             </label>
             <input
-              type="number"
+              type="text"
               required
+              inputMode="numeric"
               value={startingPrice}
-              onChange={(e) => setStartingPrice(e.target.value)}
+              onChange={(e) => setStartingPrice(e.target.value.replace(/\D/g, ''))}
             />
           </div>
         </div>

@@ -210,12 +210,12 @@ export const CreateEvent = () => {
                 Expected Guest Count *
               </label>
               <input
-                type="number"
+                type="text"
                 required
-                min={5}
-                max={5000}
+                inputMode="numeric"
+                placeholder="250"
                 value={guestCount}
-                onChange={(e) => setGuestCount(e.target.value)}
+                onChange={(e) => setGuestCount(e.target.value.replace(/\D/g, ''))}
               />
             </div>
             <div>
@@ -223,11 +223,12 @@ export const CreateEvent = () => {
                 Total Estimated Budget (₹) *
               </label>
               <input
-                type="number"
+                type="text"
                 required
-                min={500}
+                inputMode="numeric"
+                placeholder="150000"
                 value={totalBudget}
-                onChange={(e) => setTotalBudget(e.target.value)}
+                onChange={(e) => setTotalBudget(e.target.value.replace(/\D/g, ''))}
               />
             </div>
           </div>
@@ -287,10 +288,11 @@ export const CreateEvent = () => {
                     Budget Allocation (₹)
                   </label>
                   <input
-                    type="number"
+                    type="text"
+                    inputMode="numeric"
                     placeholder="25000"
                     value={req.allocatedBudget}
-                    onChange={(e) => handleRequirementChange(idx, 'allocatedBudget', e.target.value)}
+                    onChange={(e) => handleRequirementChange(idx, 'allocatedBudget', e.target.value.replace(/\D/g, ''))}
                   />
                 </div>
 

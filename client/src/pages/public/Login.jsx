@@ -15,13 +15,34 @@ export const Login = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const validateEmail = (val) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val.trim());
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+
+    const cleanEmail = email.trim();
+    if (!cleanEmail) {
+      setError('Email address is required.');
+      return;
+    }
+
+    if (!validateEmail(cleanEmail)) {
+      setError('Please enter a valid email address (e.g. name@example.com).');
+      return;
+    }
+
+    if (!password) {
+      setError('Password is required.');
+      return;
+    }
+
     setLoading(true);
 
     try {
-      const user = await login(email, password);
+      const user = await login(cleanEmail, password);
       const from = location.state?.from?.pathname;
       if (from) {
         navigate(from, { replace: true });
@@ -32,7 +53,7 @@ export const Login = () => {
         else navigate('/');
       }
     } catch (err) {
-      setError(err.message || 'Invalid credentials.');
+      setError(err.message || 'Invalid email or password.');
     } finally {
       setLoading(false);
     }
@@ -145,32 +166,53 @@ export const Login = () => {
             textAlign: 'center'
           }}>
             <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--color-text-muted)', textTransform: 'uppercase', display: 'block', marginBottom: '10px' }}>
-              Quick Demo Fill
+              Quick Demo Fill (Password: Password123!)
             </span>
-            <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
+            <div style={{ display: 'flex', gap: '6px', justifyContent: 'center', flexWrap: 'wrap' }}>
               <button
                 type="button"
-                onClick={() => fillDemoAccount('customer@eventease.local', 'Password123!')}
+                onClick={() => fillDemoAccount('priya.customer@example.com', 'Password123!')}
                 className="btn btn-outline btn-sm"
-                style={{ fontSize: '0.75rem', padding: '4px 10px' }}
+                style={{ fontSize: '0.75rem', padding: '4px 8px' }}
+                title="Customer: Priya Ramanathan"
               >
-                Customer
+                👤 Customer
               </button>
               <button
                 type="button"
-                onClick={() => fillDemoAccount('vendor1@eventease.local', 'Password123!')}
+                onClick={() => fillDemoAccount('divya.makeup@example.com', 'Password123!')}
                 className="btn btn-outline btn-sm"
-                style={{ fontSize: '0.75rem', padding: '4px 10px' }}
+                style={{ fontSize: '0.75rem', padding: '4px 8px' }}
+                title="Vendor: Divya Bridal Makeup Studio"
               >
-                Vendor
+                💄 Divya Makeup
               </button>
               <button
                 type="button"
-                onClick={() => fillDemoAccount('admin@eventease.local', 'Password123!')}
+                onClick={() => fillDemoAccount('kongumahal@example.com', 'Password123!')}
                 className="btn btn-outline btn-sm"
-                style={{ fontSize: '0.75rem', padding: '4px 10px' }}
+                style={{ fontSize: '0.75rem', padding: '4px 8px' }}
+                title="Vendor: Kongu Mahal Venue"
               >
-                Admin
+                🏰 Kongu Mahal
+              </button>
+              <button
+                type="button"
+                onClick={() => fillDemoAccount('rightstudio@example.com', 'Password123!')}
+                className="btn btn-outline btn-sm"
+                style={{ fontSize: '0.75rem', padding: '4px 8px' }}
+                title="Vendor: Right Studio Photography"
+              >
+                📸 Right Studio
+              </button>
+              <button
+                type="button"
+                onClick={() => fillDemoAccount('admin@eventease.com', 'Password123!')}
+                className="btn btn-outline btn-sm"
+                style={{ fontSize: '0.75rem', padding: '4px 8px' }}
+                title="Administrator"
+              >
+                🛡️ Admin
               </button>
             </div>
           </div>

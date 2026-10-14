@@ -46,33 +46,72 @@ export const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+
+    // 1. Email format validation
+    const cleanEmail = email.trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
+      setError('Please enter a valid email address (e.g. name@example.com).');
+      return;
+    }
+
+    // 2. Phone number validation: numbers only and exactly 10 digits
+    const cleanPhone = phone.replace(/\D/g, '');
+    if (!cleanPhone || cleanPhone.length !== 10) {
+      setError('Phone number must contain exactly 10 digits (numbers only).');
+      return;
+    }
+
+    // 3. Password validation
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters long.');
+      return;
+    }
+
+    // 4. Name validation (letters and standard name punctuation only)
+    if (!/^[a-zA-Z\s'-]+$/.test(firstName.trim()) || !/^[a-zA-Z\s'-]+$/.test(lastName.trim())) {
+      setError('First name and last name must contain only letters.');
+      return;
+    }
+
+    // 5. Vendor-specific validations
+    if (role === 'vendor') {
+      if (!businessName.trim()) {
+        setError('Business name is required.');
+        return;
+      }
+      if (!startingPrice || isNaN(startingPrice) || parseFloat(startingPrice) <= 0) {
+        setError('Please enter a valid positive starting price (₹).');
+        return;
+      }
+    }
+
     setLoading(true);
 
     try {
       if (role === 'customer') {
         const user = await registerCustomer({
-          email,
+          email: cleanEmail,
           password,
-          firstName,
-          lastName,
-          phone,
-          city,
+          firstName: firstName.trim(),
+          lastName: lastName.trim(),
+          phone: cleanPhone,
+          city: city.trim(),
           preferredTheme,
           budgetTier
         });
         navigate('/customer/dashboard');
       } else {
         const user = await registerVendor({
-          email,
+          email: cleanEmail,
           password,
-          firstName,
-          lastName,
-          phone,
-          businessName,
+          firstName: firstName.trim(),
+          lastName: lastName.trim(),
+          phone: cleanPhone,
+          businessName: businessName.trim(),
           bio,
-          city,
-          serviceRadiusKm,
-          startingPrice,
+          city: city.trim(),
+          serviceRadiusKm: parseInt(serviceRadiusKm || 50, 10),
+          startingPrice: parseFloat(startingPrice || 10000),
           categoryId
         });
         navigate('/vendor/dashboard');
@@ -184,9 +223,9 @@ export const Register = () => {
                 <input
                   type="text"
                   required
-                  placeholder="Sophia"
+                  placeholder="Priya"
                   value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
+                  onChange={(e) => setFirstName(e.target.value.replace(/[^a-zA-Z\s'-]/g, ''))}
                 />
               </div>
               <div>
@@ -196,9 +235,9 @@ export const Register = () => {
                 <input
                   type="text"
                   required
-                  placeholder="Montgomery"
+                  placeholder="Ramanathan"
                   value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
+                  onChange={(e) => setLastName(e.target.value.replace(/[^a-zA-Z\s'-]/g, ''))}
                 />
               </div>
             </div>
@@ -212,20 +251,36 @@ export const Register = () => {
                 <input
                   type="email"
                   required
-                  placeholder="sophia@example.com"
+                  placeholder="priya@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
               <div>
-                <label style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--color-text-title)', display: 'block', marginBottom: '4px' }}>
-                  Phone Number
-                </label>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                  <label style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--color-text-title)', display: 'block' }}>
+                    Phone Number *
+                  </label>
+                  <span style={{
+                    fontSize: '0.72rem',
+                    fontWeight: 600,
+                    color: phone.length === 10 ? 'var(--color-success)' : phone.length > 0 ? 'var(--color-danger)' : 'var(--color-text-muted)'
+                  }}>
+                    {phone.length === 10 ? '✓ 10 digits' : `${phone.length}/10 digits`}
+                  </span>
+                </div>
                 <input
                   type="tel"
-                  placeholder="+1 (555) 019-2834"
+                  required
+                  maxLength={10}
+                  inputMode="numeric"
+                  pattern="[0-9]{10}"
+                  placeholder="9842122334"
                   value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
+                  onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                  style={{
+                    borderColor: phone && phone.length !== 10 ? 'var(--color-danger)' : undefined
+                  }}
                 />
               </div>
             </div>
@@ -322,11 +377,12 @@ export const Register = () => {
                       Starting Price (₹) *
                     </label>
                     <input
-                      type="number"
+                      type="text"
                       required
+                      inputMode="numeric"
                       placeholder="10000"
                       value={startingPrice}
-                      onChange={(e) => setStartingPrice(e.target.value)}
+                      onChange={(e) => setStartingPrice(e.target.value.replace(/\D/g, ''))}
                     />
                   </div>
                 </div>

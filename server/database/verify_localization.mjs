@@ -175,7 +175,7 @@ async function runTests() {
     categoryId: vendorDetail.services[0].category_id,
     eventName: "Divya's Engagement Ceremony",
     eventType: 'Engagement',
-    eventDate: '2026-12-15',
+    eventDate: `2027-02-${String(Math.floor(10 + Math.random() * 18))}`,
     eventTime: '10:00:00',
     location: 'Residency Towers, Avinashi Road',
     city: 'Coimbatore',

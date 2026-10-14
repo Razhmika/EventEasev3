@@ -21,6 +21,7 @@ import api from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { Navbar } from '../../components/layout/Navbar';
 import { Footer } from '../../components/layout/Footer';
+import DynamicBookingModal from '../../components/booking/DynamicBookingModal';
 
 export const VendorProfilePage = () => {
   const { id } = useParams();
@@ -36,22 +37,9 @@ export const VendorProfilePage = () => {
   const [error, setError] = useState('');
   const [messagingLoading, setMessagingLoading] = useState(false);
 
-  // Direct Booking Modal State
+  // Dynamic Booking Modal State
   const [showBookingModal, setShowBookingModal] = useState(false);
-  const [selectedServiceId, setSelectedServiceId] = useState('');
-  const [selectedCategoryId, setSelectedCategoryId] = useState('');
-  const [eventName, setEventName] = useState('');
-  const [eventType, setEventType] = useState('Wedding');
-  const [eventDate, setEventDate] = useState('');
-  const [eventTime, setEventTime] = useState('18:00');
-  const [venueLocation, setVenueLocation] = useState('');
-  const [eventCity, setEventCity] = useState('');
-  const [guestCount, setGuestCount] = useState('100');
-  const [quoteAmount, setQuoteAmount] = useState('');
-  const [requirementsNotes, setRequirementsNotes] = useState('');
-  const [customerNotes, setCustomerNotes] = useState('');
-  const [bookingSubmitting, setBookingSubmitting] = useState(false);
-  const [bookingSuccess, setBookingSuccess] = useState(false);
+  const [selectedInitialService, setSelectedInitialService] = useState(null);
 
   useEffect(() => {
     const fetchVendorData = async () => {
@@ -60,14 +48,6 @@ export const VendorProfilePage = () => {
         const res = await api.get(`/vendors/${id}`);
         if (res.success && res.data) {
           setVendor(res.data);
-          setEventCity(res.data.city || '');
-          if (res.data.services?.length > 0) {
-            setSelectedServiceId(res.data.services[0].id);
-            setSelectedCategoryId(res.data.services[0].category_id);
-            setQuoteAmount(res.data.services[0].price);
-          } else {
-            setQuoteAmount(res.data.starting_price || '');
-          }
         }
       } catch (err) {
         setError(err.message || 'Vendor not found.');
@@ -80,10 +60,15 @@ export const VendorProfilePage = () => {
 
   // Open modal automatically if ?book=true is passed
   useEffect(() => {
-    if (searchParams.get('book') === 'true') {
+    if (searchParams.get('book') === 'true' && vendor) {
+      if (!user) {
+        navigate('/login');
+        return;
+      }
+      setSelectedInitialService(vendor.services?.[0] || null);
       setShowBookingModal(true);
     }
-  }, [searchParams]);
+  }, [searchParams, vendor, user, navigate]);
 
   // Initiate direct chat with this vendor
   const handleMessageVendor = async () => {
@@ -112,57 +97,12 @@ export const VendorProfilePage = () => {
   };
 
   const handleOpenBookingWithService = (service) => {
-    if (service) {
-      setSelectedServiceId(service.id);
-      setSelectedCategoryId(service.category_id);
-      setQuoteAmount(service.price);
-    }
-    setShowBookingModal(true);
-  };
-
-  const handleBookingSubmit = async (e) => {
-    e.preventDefault();
     if (!user) {
       navigate('/login');
       return;
     }
-    if (!eventDate) {
-      alert('Please select the scheduled date for your celebration.');
-      return;
-    }
-
-    setBookingSubmitting(true);
-    try {
-      const res = await api.post('/bookings', {
-        vendorId: vendor.id,
-        serviceId: selectedServiceId || null,
-        categoryId: selectedCategoryId || null,
-        eventName: eventName.trim() || `${eventType} Celebration`,
-        eventType,
-        eventDate,
-        eventTime,
-        location: venueLocation || 'To be finalized',
-        city: eventCity || vendor.city,
-        guestCount: guestCount ? parseInt(guestCount, 10) : 50,
-        estimatedBudget: quoteAmount ? parseFloat(quoteAmount) : vendor.starting_price,
-        quoteAmount: quoteAmount ? parseFloat(quoteAmount) : vendor.starting_price,
-        requirementsNotes,
-        customerNotes
-      });
-
-      if (res.success) {
-        setBookingSuccess(true);
-        setTimeout(() => {
-          setShowBookingModal(false);
-          setBookingSuccess(false);
-          navigate('/customer/bookings');
-        }, 1600);
-      }
-    } catch (err) {
-      alert(err.message || 'Failed to submit direct booking request.');
-    } finally {
-      setBookingSubmitting(false);
-    }
+    setSelectedInitialService(service || null);
+    setShowBookingModal(true);
   };
 
   if (loading) {
@@ -236,7 +176,7 @@ export const VendorProfilePage = () => {
               </button>
               <button
                 type="button"
-                onClick={() => setShowBookingModal(true)}
+                onClick={() => handleOpenBookingWithService(vendor.services?.[0] || null)}
                 className="btn btn-primary"
                 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
               >
@@ -502,7 +442,7 @@ export const VendorProfilePage = () => {
 
             <button
               type="button"
-              onClick={() => setShowBookingModal(true)}
+              onClick={() => handleOpenBookingWithService(vendor.services?.[0] || null)}
               className="btn btn-primary"
               style={{ width: '100%', marginBottom: '12px', padding: '12px 16px', fontSize: '0.95rem' }}
             >
@@ -528,204 +468,19 @@ export const VendorProfilePage = () => {
 
       </div>
 
-      {/* Direct Booking Modal */}
-      {showBookingModal && (
-        <div className="modal-overlay" onClick={() => setShowBookingModal(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '640px', maxHeight: '90vh', overflowY: 'auto' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', paddingBottom: '14px', borderBottom: '1px solid var(--color-border)' }}>
-              <div>
-                <h3 style={{ margin: '0 0 4px', fontSize: '1.3rem' }}>Direct Booking Inquiry</h3>
-                <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>
-                  Requesting {vendor.business_name} • No prior event creation required
-                </p>
-              </div>
-              <button onClick={() => setShowBookingModal(false)}>
-                <X size={20} color="var(--color-text-muted)" />
-              </button>
-            </div>
-
-            {bookingSuccess ? (
-              <div style={{ textAlign: 'center', padding: '36px 0' }}>
-                <CheckCircle size={54} color="var(--color-success)" style={{ margin: '0 auto 16px' }} />
-                <h4 style={{ fontSize: '1.3rem', marginBottom: '8px' }}>Booking Request Dispatched!</h4>
-                <p style={{ color: 'var(--color-text-muted)', fontSize: '0.95rem', maxWidth: '420px', margin: '0 auto' }}>
-                  {vendor.business_name} will review your event requirements and provide a binding quotation or response shortly.
-                </p>
-              </div>
-            ) : !user ? (
-              <div style={{ textAlign: 'center', padding: '30px 0' }}>
-                <p style={{ marginBottom: '16px', color: 'var(--color-text-body)' }}>
-                  Please sign in to send booking inquiries directly to vendors.
-                </p>
-                <Link to="/login" className="btn btn-primary btn-sm">Sign In to Continue</Link>
-              </div>
-            ) : (
-              <form onSubmit={handleBookingSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                
-                {/* Desired Service Selection */}
-                <div>
-                  <label style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--color-text-title)', display: 'block', marginBottom: '6px' }}>
-                    Select Service Offering / Package
-                  </label>
-                  <select
-                    value={selectedServiceId}
-                    onChange={(e) => {
-                      const sId = e.target.value;
-                      setSelectedServiceId(sId);
-                      const svc = vendor.services?.find((s) => s.id.toString() === sId);
-                      if (svc) {
-                        setSelectedCategoryId(svc.category_id);
-                        setQuoteAmount(svc.price);
-                      }
-                    }}
-                  >
-                    <option value="">General Custom Inquiry (Full Event)</option>
-                    {vendor.services?.map((s) => (
-                      <option key={s.id} value={s.id}>
-                        {s.title} — ₹{parseFloat(s.price).toLocaleString('en-IN')} (per {s.pricing_unit})
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Event Name & Event Type */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '12px' }}>
-                  <div>
-                    <label style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--color-text-title)', display: 'block', marginBottom: '6px' }}>
-                      Event Title / Occasion *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="e.g. Arjun's Wedding Reception"
-                      value={eventName}
-                      onChange={(e) => setEventName(e.target.value)}
-                    />
-                  </div>
-
-                  <div>
-                    <label style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--color-text-title)', display: 'block', marginBottom: '6px' }}>
-                      Event Type *
-                    </label>
-                    <select value={eventType} onChange={(e) => setEventType(e.target.value)} required>
-                      <option value="Wedding">Wedding</option>
-                      <option value="Reception">Reception</option>
-                      <option value="Engagement">Engagement Ceremony</option>
-                      <option value="Birthday">Birthday Celebration</option>
-                      <option value="Anniversary">Family Anniversary</option>
-                      <option value="Housewarming">Housewarming Function</option>
-                      <option value="Corporate">Corporate Annual Day</option>
-                      <option value="College Cultural">College Cultural Fest</option>
-                      <option value="Other">Other Special Occasion</option>
-                    </select>
-                  </div>
-                </div>
-
-                {/* Date & Time */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                  <div>
-                    <label style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--color-text-title)', display: 'block', marginBottom: '6px' }}>
-                      Event Date *
-                    </label>
-                    <input
-                      type="date"
-                      required
-                      value={eventDate}
-                      onChange={(e) => setEventDate(e.target.value)}
-                    />
-                  </div>
-
-                  <div>
-                    <label style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--color-text-title)', display: 'block', marginBottom: '6px' }}>
-                      Event Start Time
-                    </label>
-                    <input
-                      type="time"
-                      value={eventTime}
-                      onChange={(e) => setEventTime(e.target.value)}
-                    />
-                  </div>
-                </div>
-
-                {/* Venue Location & City */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '12px' }}>
-                  <div>
-                    <label style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--color-text-title)', display: 'block', marginBottom: '6px' }}>
-                      Venue / Destination Address
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="Enter event location (e.g. Kongu Mahal, Avinashi Road)"
-                      value={venueLocation}
-                      onChange={(e) => setVenueLocation(e.target.value)}
-                    />
-                  </div>
-
-                  <div>
-                    <label style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--color-text-title)', display: 'block', marginBottom: '6px' }}>
-                      City
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="Coimbatore"
-                      value={eventCity}
-                      onChange={(e) => setEventCity(e.target.value)}
-                    />
-                  </div>
-                </div>
-
-                {/* Guests & Proposed Budget */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                  <div>
-                    <label style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--color-text-title)', display: 'block', marginBottom: '6px' }}>
-                      Expected Guest Count
-                    </label>
-                    <input
-                      type="number"
-                      placeholder="e.g. 250"
-                      value={guestCount}
-                      onChange={(e) => setGuestCount(e.target.value)}
-                    />
-                  </div>
-
-                  <div>
-                    <label style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--color-text-title)', display: 'block', marginBottom: '6px' }}>
-                      Estimated Budget / Offer (₹ INR)
-                    </label>
-                    <input
-                      type="number"
-                      placeholder={`e.g. ${vendor.starting_price}`}
-                      value={quoteAmount}
-                      onChange={(e) => setQuoteAmount(e.target.value)}
-                    />
-                  </div>
-                </div>
-
-                {/* Message to Vendor */}
-                <div>
-                  <label style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--color-text-title)', display: 'block', marginBottom: '6px' }}>
-                    Special Requests, Theme & Vision Notes
-                  </label>
-                  <textarea
-                    rows={3}
-                    placeholder="Share any special vision details, decoration style, or requirements..."
-                    value={customerNotes}
-                    onChange={(e) => setCustomerNotes(e.target.value)}
-                  />
-                </div>
-
-                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '12px', borderTop: '1px solid var(--color-border)', paddingTop: '16px' }}>
-                  <button type="button" onClick={() => setShowBookingModal(false)} className="btn btn-outline btn-sm">
-                    Cancel
-                  </button>
-                  <button type="submit" disabled={bookingSubmitting} className="btn btn-primary btn-sm">
-                    {bookingSubmitting ? 'Sending Request...' : 'Send Booking Inquiry'}
-                  </button>
-                </div>
-              </form>
-            )}
-          </div>
-        </div>
+      {/* Dynamic Service-Specific Booking Inquiry Modal */}
+      {showBookingModal && vendor && (
+        <DynamicBookingModal
+          vendor={vendor}
+          initialService={selectedInitialService}
+          onClose={() => {
+            setShowBookingModal(false);
+            setSelectedInitialService(null);
+          }}
+          onSuccess={() => {
+            navigate('/customer/bookings');
+          }}
+        />
       )}
     </div>
   );

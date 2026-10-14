@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { BookmarkCheck, Star, Calendar, MessageSquare, X, CheckCircle, AlertCircle, Store } from 'lucide-react';
 import api from '../../services/api';
+import ServiceRequirementsBadge from '../../components/booking/ServiceRequirementsBadge';
 
 export const CustomerBookings = () => {
   const navigate = useNavigate();
@@ -215,6 +216,11 @@ export const CustomerBookings = () => {
                     "{b.customer_notes || 'No custom notes attached.'}"
                   </p>
                 </div>
+              </div>
+
+              {/* Service-Specific Detailed Requirements */}
+              <div style={{ marginTop: '14px' }}>
+                <ServiceRequirementsBadge booking={b} />
               </div>
 
               {/* STATUS-SPECIFIC BANNERS */}

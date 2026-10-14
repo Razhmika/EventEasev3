@@ -21,7 +21,8 @@ export const createBooking = async (req, res) => {
     totalBudget,
     requirementsNotes,
     quoteAmount,
-    customerNotes
+    customerNotes,
+    serviceRequirements
   } = req.body;
 
   if (!vendorId) {
@@ -32,10 +33,59 @@ export const createBooking = async (req, res) => {
   try {
     await conn.beginTransaction();
 
+    // Fetch vendor profile details for intelligent location resolution
+    const [vendorRows] = await conn.execute(
+      `SELECT vp.id, vp.user_id, vp.business_name, vp.city, vp.address, vp.starting_price 
+       FROM vendor_profiles vp WHERE vp.id = ?`,
+      [vendorId]
+    );
+    if (vendorRows.length === 0) {
+      await conn.rollback();
+      return sendError(res, 'Vendor not found.', 404);
+    }
+    const vendorProfile = vendorRows[0];
+
     let actualEventId = eventId;
     let actualCategoryId = categoryId;
+    let categorySlug = '';
     let eventTitle = title || eventName;
     let eventDateVal = eventDate;
+
+    // Resolve categoryId and categorySlug
+    if (serviceId) {
+      const [serviceRows] = await conn.execute(
+        `SELECT vs.category_id, sc.slug 
+         FROM vendor_services vs 
+         JOIN service_categories sc ON vs.category_id = sc.id 
+         WHERE vs.id = ?`,
+        [serviceId]
+      );
+      if (serviceRows.length > 0) {
+        actualCategoryId = serviceRows[0].category_id;
+        categorySlug = serviceRows[0].slug;
+      }
+    }
+
+    if (!actualCategoryId) {
+      const [vendCats] = await conn.execute(
+        `SELECT vs.category_id, sc.slug 
+         FROM vendor_services vs 
+         JOIN service_categories sc ON vs.category_id = sc.id 
+         WHERE vs.vendor_id = ? AND vs.is_active = TRUE LIMIT 1`,
+        [vendorId]
+      );
+      if (vendCats.length > 0) {
+        actualCategoryId = vendCats[0].category_id;
+        categorySlug = vendCats[0].slug;
+      } else {
+        const [defaultCat] = await conn.execute(`SELECT id, slug FROM service_categories LIMIT 1`);
+        actualCategoryId = defaultCat.length > 0 ? defaultCat[0].id : 1;
+        categorySlug = defaultCat.length > 0 ? defaultCat[0].slug : '';
+      }
+    } else if (!categorySlug) {
+      const [catRows] = await conn.execute(`SELECT slug FROM service_categories WHERE id = ?`, [actualCategoryId]);
+      if (catRows.length > 0) categorySlug = catRows[0].slug;
+    }
 
     // Direct booking flow: Create event atomically if eventId is not provided
     if (!actualEventId) {
@@ -46,35 +96,54 @@ export const createBooking = async (req, res) => {
 
       eventTitle = eventTitle?.trim() || `${eventType || 'Special'} Event`;
       const finalEventType = eventType || 'Special Event';
-      const finalGuestCount = guestCount ? parseInt(guestCount, 10) : 50;
-      const finalBudget = estimatedBudget || totalBudget || quoteAmount || 0;
 
-      // Resolve categoryId if missing
-      if (!actualCategoryId) {
-        if (serviceId) {
-          const [serviceRows] = await conn.execute(
-            `SELECT category_id FROM vendor_services WHERE id = ?`,
-            [serviceId]
-          );
-          if (serviceRows.length > 0) {
-            actualCategoryId = serviceRows[0].category_id;
-          }
+      // Intelligent Location Resolution:
+      // If service is a fixed venue (marriage hall), or studio visit is chosen, use vendor's address automatically
+      let finalLocation = location ? location.trim() : '';
+      let finalCity = city ? city.trim() : (vendorProfile.city || 'Coimbatore');
+
+      if (categorySlug === 'venues') {
+        finalLocation = vendorProfile.address || `${vendorProfile.business_name}, ${vendorProfile.city}`;
+        finalCity = vendorProfile.city;
+      } else if (serviceRequirements?.serviceLocationType === 'studio') {
+        finalLocation = vendorProfile.address || `${vendorProfile.business_name} Studio, ${vendorProfile.city}`;
+        finalCity = vendorProfile.city;
+      } else if (!finalLocation) {
+        finalLocation = serviceRequirements?.gettingReadyLocation || serviceRequirements?.eventLocation || 'Venue To Be Finalized';
+      }
+
+      // Guest Count handling based on service category:
+      // Bridal makeup does not collect irrelevant guest counts from customer
+      let finalGuestCount = 50;
+      if (categorySlug === 'bridal-makeup') {
+        finalGuestCount = serviceRequirements?.peopleCount || (guestCount ? parseInt(guestCount, 10) : 1);
+      } else if (categorySlug === 'catering') {
+        finalGuestCount = serviceRequirements?.plateCount ? parseInt(serviceRequirements.plateCount, 10) : (guestCount ? parseInt(guestCount, 10) : 100);
+      } else if (categorySlug === 'venues') {
+        finalGuestCount = serviceRequirements?.guestCount ? parseInt(serviceRequirements.guestCount, 10) : (guestCount ? parseInt(guestCount, 10) : 200);
+      } else {
+        finalGuestCount = guestCount ? parseInt(guestCount, 10) : 50;
+      }
+
+      // Backend service-specific validation
+      if (categorySlug === 'bridal-makeup') {
+        if (serviceRequirements && serviceRequirements.serviceLocationType !== 'studio' && !finalLocation) {
+          await conn.rollback();
+          return sendError(res, 'Getting-ready location or address is required for bridal makeup.', 400);
+        }
+      } else if (categorySlug === 'venues') {
+        if (!finalGuestCount || finalGuestCount < 1) {
+          await conn.rollback();
+          return sendError(res, 'Expected guest count is required for venue and marriage hall bookings.', 400);
+        }
+      } else if (categorySlug === 'catering') {
+        if (!finalGuestCount || finalGuestCount < 1) {
+          await conn.rollback();
+          return sendError(res, 'Expected number of plates is required for catering inquiries.', 400);
         }
       }
 
-      if (!actualCategoryId) {
-        // Fallback to vendor's first offered category or default
-        const [vendCats] = await conn.execute(
-          `SELECT category_id FROM vendor_services WHERE vendor_id = ? AND is_active = TRUE LIMIT 1`,
-          [vendorId]
-        );
-        if (vendCats.length > 0) {
-          actualCategoryId = vendCats[0].category_id;
-        } else {
-          const [defaultCat] = await conn.execute(`SELECT id FROM service_categories LIMIT 1`);
-          actualCategoryId = defaultCat.length > 0 ? defaultCat[0].id : 1;
-        }
-      }
+      const finalBudget = estimatedBudget || totalBudget || quoteAmount || vendorProfile.starting_price || 0;
 
       // Create event atomically
       const [newEventRes] = await conn.execute(
@@ -85,9 +154,9 @@ export const createBooking = async (req, res) => {
           eventTitle,
           finalEventType,
           eventDateVal,
-          eventTime || '18:00:00',
-          location || 'To be determined',
-          city || 'Main City',
+          eventTime || '10:00:00',
+          finalLocation,
+          finalCity,
           finalGuestCount,
           parseFloat(finalBudget) || 0,
           requirementsNotes || customerNotes || null
@@ -107,17 +176,6 @@ export const createBooking = async (req, res) => {
       }
       eventTitle = events[0].title;
       eventDateVal = events[0].event_date;
-
-      if (!actualCategoryId) {
-        if (serviceId) {
-          const [sRows] = await conn.execute(`SELECT category_id FROM vendor_services WHERE id = ?`, [serviceId]);
-          if (sRows.length > 0) actualCategoryId = sRows[0].category_id;
-        }
-        if (!actualCategoryId) {
-          const [defaultCat] = await conn.execute(`SELECT id FROM service_categories LIMIT 1`);
-          actualCategoryId = defaultCat.length > 0 ? defaultCat[0].id : 1;
-        }
-      }
     }
 
     // Check if duplicate booking already exists for this vendor and event
@@ -130,12 +188,13 @@ export const createBooking = async (req, res) => {
       return sendError(res, `A booking request is already ${existing[0].status} with this vendor.`, 409);
     }
 
-    const finalQuoteAmount = quoteAmount || estimatedBudget || null;
+    const finalQuoteAmount = quoteAmount || estimatedBudget || vendorProfile.starting_price || null;
+    const serviceReqJson = serviceRequirements ? JSON.stringify(serviceRequirements) : null;
 
-    // Insert booking
+    // Insert booking with service_requirements
     const [bookRes] = await conn.execute(
-      `INSERT INTO bookings (event_id, customer_id, vendor_id, category_id, service_id, status, quote_amount, customer_notes)
-       VALUES (?, ?, ?, ?, ?, 'pending', ?, ?)`,
+      `INSERT INTO bookings (event_id, customer_id, vendor_id, category_id, service_id, status, quote_amount, service_requirements, customer_notes)
+       VALUES (?, ?, ?, ?, ?, 'pending', ?, ?, ?)`,
       [
         actualEventId,
         customerId,
@@ -143,6 +202,7 @@ export const createBooking = async (req, res) => {
         actualCategoryId,
         serviceId || null,
         finalQuoteAmount ? parseFloat(finalQuoteAmount) : null,
+        serviceReqJson,
         customerNotes || requirementsNotes || null
       ]
     );
@@ -156,16 +216,13 @@ export const createBooking = async (req, res) => {
     );
 
     // Create Notification for Vendor
-    const [vendorUser] = await conn.execute(
-      `SELECT user_id, business_name FROM vendor_profiles WHERE id = ?`,
-      [vendorId]
-    );
-    if (vendorUser.length > 0) {
+    const vendorUserId = vendorProfile.user_id;
+    if (vendorUserId) {
       await conn.execute(
         `INSERT INTO notifications (user_id, title, message, type, link_url)
          VALUES (?, 'New Booking Inquiry', ?, 'info', '/vendor/bookings')`,
         [
-          vendorUser[0].user_id,
+          vendorUserId,
           `You have received a new booking request for "${eventTitle}" on ${eventDateVal}.`
         ]
       );
@@ -234,6 +291,7 @@ export const getMyBookings = async (req, res) => {
           b.service_id,
           b.status,
           b.quote_amount,
+          b.service_requirements,
           b.customer_notes,
           b.vendor_response,
           b.rejection_reason,
@@ -248,9 +306,11 @@ export const getMyBookings = async (req, res) => {
           e.guest_count,
           vp.business_name,
           vp.city as vendor_city,
+          vp.address as vendor_address,
           vp.avatar_url as vendor_avatar,
           vp.average_rating,
           sc.name as category_name,
+          sc.slug as category_slug,
           vs.title as service_title,
           vs.price as service_price,
           vs.pricing_unit as service_pricing_unit,
@@ -277,6 +337,7 @@ export const getMyBookings = async (req, res) => {
           b.service_id,
           b.status,
           b.quote_amount,
+          b.service_requirements,
           b.customer_notes,
           b.vendor_response,
           b.rejection_reason,
@@ -296,12 +357,17 @@ export const getMyBookings = async (req, res) => {
           u.email as customer_email,
           u.phone as customer_phone,
           cp.avatar_url as customer_avatar,
+          vp.business_name,
+          vp.city as vendor_city,
+          vp.address as vendor_address,
           sc.name as category_name,
+          sc.slug as category_slug,
           vs.title as service_title,
           vs.price as service_price,
           vs.pricing_unit as service_pricing_unit
         FROM bookings b
         JOIN events e ON b.event_id = e.id
+        JOIN vendor_profiles vp ON b.vendor_id = vp.id
         JOIN customer_profiles cp ON b.customer_id = cp.id
         JOIN users u ON cp.user_id = u.id
         JOIN service_categories sc ON b.category_id = sc.id
@@ -316,13 +382,17 @@ export const getMyBookings = async (req, res) => {
           b.id,
           b.status,
           b.quote_amount,
+          b.service_requirements,
           b.rejection_reason,
           b.created_at,
           e.title as event_title,
           DATE_FORMAT(e.event_date, '%Y-%m-%d') as event_date,
           vp.business_name,
+          vp.city as vendor_city,
+          vp.address as vendor_address,
           CONCAT(u.first_name, ' ', u.last_name) as customer_name,
           sc.name as category_name,
+          sc.slug as category_slug,
           vs.title as service_title
         FROM bookings b
         JOIN events e ON b.event_id = e.id
@@ -337,7 +407,21 @@ export const getMyBookings = async (req, res) => {
     }
 
     const [bookings] = await pool.execute(sql, params);
-    return sendSuccess(res, bookings, 'Bookings retrieved successfully.');
+    const parsedBookings = bookings.map(b => {
+      let reqs = b.service_requirements;
+      if (typeof reqs === 'string') {
+        try {
+          reqs = JSON.parse(reqs);
+        } catch {
+          reqs = null;
+        }
+      }
+      return {
+        ...b,
+        service_requirements: reqs
+      };
+    });
+    return sendSuccess(res, parsedBookings, 'Bookings retrieved successfully.');
   } catch (error) {
     console.error('[Get Bookings Error]', error);
     return sendError(res, 'Failed to fetch bookings.', 500);

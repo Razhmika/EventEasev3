@@ -15,6 +15,7 @@ import {
   Users
 } from 'lucide-react';
 import api from '../../services/api';
+import ServiceRequirementsBadge from '../../components/booking/ServiceRequirementsBadge';
 
 export const VendorBookings = () => {
   const navigate = useNavigate();
@@ -255,12 +256,26 @@ export const VendorBookings = () => {
                 </div>
 
                 <div>
-                  <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', display: 'block', fontWeight: 600 }}>Location & Guests</span>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', display: 'block', fontWeight: 600 }}>
+                    {b.category_slug === 'bridal-makeup'
+                      ? 'Location & People'
+                      : b.category_slug === 'catering'
+                      ? 'Location & Plates'
+                      : b.category_slug === 'venues'
+                      ? 'Venue & Capacity'
+                      : 'Location & Scope'}
+                  </span>
                   <strong style={{ fontSize: '0.95rem', color: 'var(--color-text-title)' }}>
                     {b.event_city}
                   </strong>
                   <div style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', marginTop: '2px' }}>
-                    {b.event_location || 'Venue TBD'} &bull; {b.guest_count} guests
+                    {b.category_slug === 'bridal-makeup'
+                      ? `${b.service_requirements?.peopleCount || 1} people • ${b.service_requirements?.gettingReadyLocation || b.event_location}`
+                      : b.category_slug === 'catering'
+                      ? `${b.service_requirements?.plateCount || b.guest_count} plates • ${b.service_requirements?.foodPreference || 'Feast'}`
+                      : b.category_slug === 'venues'
+                      ? `${b.service_requirements?.guestCount || b.guest_count} guests capacity`
+                      : `${b.event_location || 'Venue TBD'}${b.guest_count ? ` • ${b.guest_count} guests` : ''}`}
                   </div>
                 </div>
 
@@ -276,6 +291,9 @@ export const VendorBookings = () => {
                   )}
                 </div>
               </div>
+
+              {/* Service-Specific Detailed Requirements */}
+              <ServiceRequirementsBadge booking={b} />
 
               {/* Message & Feedback Sections */}
               <div>

@@ -483,9 +483,9 @@ async function initDatabase() {
 
     // Create vendor profile
     const [vRes] = await conn.execute(
-      `INSERT INTO vendor_profiles (user_id, business_name, bio, city, service_radius_km, starting_price, verification_status, average_rating, review_count, avatar_url, banner_url)
-       VALUES (?, ?, ?, ?, ?, ?, 'verified', ?, ?, ?, ?)`,
-      [userId, v.business_name, v.bio, v.city, v.service_radius_km, v.starting_price, v.rating, v.review_count, v.avatar_url, v.banner_url]
+      `INSERT INTO vendor_profiles (user_id, business_name, bio, city, address, service_radius_km, starting_price, verification_status, average_rating, review_count, avatar_url, banner_url)
+       VALUES (?, ?, ?, ?, ?, ?, ?, 'verified', ?, ?, ?, ?)`,
+      [userId, v.business_name, v.bio, v.city, v.address || `${v.city}, Tamil Nadu`, v.service_radius_km, v.starting_price, v.rating, v.review_count, v.avatar_url, v.banner_url]
     );
     const vendorId = vRes.insertId;
     vendorIdMap[v.email] = vendorId;
@@ -611,24 +611,45 @@ async function initDatabase() {
   const muruganServices = vendorServiceIdMap[muruganVendorId] || [];
 
   // Pending Booking with Right Studio Photography
+  const photoReq = JSON.stringify({
+    coverageType: 'Both Photography & Videography',
+    eventDays: 1,
+    approxDurationHours: 8,
+    albumRequired: true,
+    specialShots: 'Candid moments and stage family shots',
+    eventLocation: 'Kongu Mahal, Avinashi Road, Coimbatore'
+  });
   const [b1Res] = await conn.execute(
-    `INSERT INTO bookings (event_id, customer_id, vendor_id, category_id, service_id, status, quote_amount, customer_notes, vendor_response)
-     VALUES (?, ?, ?, ?, ?, 'pending', 25000.00, 'We need wedding and reception photography with traditional albums for 350 guests at Kongu Mahal.', NULL)`,
-    [eventId, customerId, rightStudioVendorId, categoryMap['photography'], rightStudioServices[0]?.id || null]
+    `INSERT INTO bookings (event_id, customer_id, vendor_id, category_id, service_id, status, quote_amount, service_requirements, customer_notes, vendor_response)
+     VALUES (?, ?, ?, ?, ?, 'pending', 25000.00, ?, 'We need wedding and reception photography with traditional albums for 350 guests at Kongu Mahal.', NULL)`,
+    [eventId, customerId, rightStudioVendorId, categoryMap['photography'], rightStudioServices[0]?.id || null, photoReq]
   );
 
   // Accepted Booking with Kovai Annapoorna Catering Services
+  const caterReq = JSON.stringify({
+    mealType: 'Dinner (Traditional South Indian Feast)',
+    foodPreference: 'Pure Vegetarian',
+    plateCount: 350,
+    servingStyle: 'Traditional Banana Leaf Service & Live Dosa Counter',
+    specialDietaryNotes: 'Traditional sweets, signature payasam, filter coffee counter'
+  });
   const [b2Res] = await conn.execute(
-    `INSERT INTO bookings (event_id, customer_id, vendor_id, category_id, service_id, status, quote_amount, customer_notes, vendor_response)
-     VALUES (?, ?, ?, ?, ?, 'accepted', 75000.00, 'Dinner feast for 350 guests with traditional sweets and live dosa counters.', 'Vanakkam! Delighted to cater for Arjun\\'s wedding reception. We will arrange live dosa counters and our signature Kovai payasam.')`,
-    [eventId, customerId, annapoornaVendorId, categoryMap['catering'], annapoornaServices[0]?.id || null]
+    `INSERT INTO bookings (event_id, customer_id, vendor_id, category_id, service_id, status, quote_amount, service_requirements, customer_notes, vendor_response)
+     VALUES (?, ?, ?, ?, ?, 'accepted', 75000.00, ?, 'Dinner feast for 350 guests with traditional sweets and live dosa counters.', 'Vanakkam! Delighted to cater for Arjun\\'s wedding reception. We will arrange live dosa counters and our signature Kovai payasam.')`,
+    [eventId, customerId, annapoornaVendorId, categoryMap['catering'], annapoornaServices[0]?.id || null, caterReq]
   );
 
   // Accepted Booking with Sri Murugan Wedding Decorations
+  const decorReq = JSON.stringify({
+    decorAreas: ['Stage Mandapam', 'Entrance Garland Arch', 'Reception Backdrop'],
+    themeStyle: 'Traditional South Indian Temple Floral Mandapam',
+    flowerPreference: 'Fresh Jasmine, Marigold and Pink Lotus',
+    setupTimeRequired: 'Previous day night 10:00 PM'
+  });
   await conn.execute(
-    `INSERT INTO bookings (event_id, customer_id, vendor_id, category_id, service_id, status, quote_amount, customer_notes, vendor_response)
-     VALUES (?, ?, ?, ?, ?, 'accepted', 25000.00, 'Lavender and white fresh flower stage decoration for reception.', 'Thank you! We have reserved the date and will prepare a grand stage backdrop with fresh jasmine and roses.')`,
-    [eventId, customerId, muruganVendorId, categoryMap['decor-floral'], muruganServices[0]?.id || null]
+    `INSERT INTO bookings (event_id, customer_id, vendor_id, category_id, service_id, status, quote_amount, service_requirements, customer_notes, vendor_response)
+     VALUES (?, ?, ?, ?, ?, 'accepted', 25000.00, ?, 'Lavender and white fresh flower stage decoration for reception.', 'Thank you! We have reserved the date and will prepare a grand stage backdrop with fresh jasmine and roses.')`,
+    [eventId, customerId, muruganVendorId, categoryMap['decor-floral'], muruganServices[0]?.id || null, decorReq]
   );
 
   // 7. Completed Past Event & Verified Review
